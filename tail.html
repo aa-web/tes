@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulk Email Sender</title>
+  <script src="https://cdn.tailwindcss.com" ></script>
+</head>
+<body class="bg-gray-900 text-white">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Bulk Email Sender</h1>
+    <div class="flex">
+      <div class="w-2/3 pr-4">
+        <div class="mb-4">
+          <label for="smtp-host" class="block text-sm font-bold mb-2">SMTP Host:</label>
+          <input type="text" id="smtp-host" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+          <label for="smtp-port" class="block text-sm font-bold mb-2">SMTP Port:</label>
+          <input type="text" id="smtp-port" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+          <label for="smtp-secure" class="block text-sm font-bold mb-2">SMTP Secure:</label>
+          <input type="checkbox" id="smtp-secure" class="form-checkbox">
+        </div>
+        <div class="mb-4">
+          <label for="smtp-user" class="block text-sm font-bold mb-2">SMTP User:</label>
+          <input type="text" id="smtp-user" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+          <label for="smtp-pass" class="block text-sm font-bold mb-2">SMTP Password:</label>
+          <input type="password" id="smtp-pass" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+          <label for="from-email" class="block text-sm font-bold mb-2">From Email:</label>
+          <input type="email" id="from-email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+          <label for="from-name" class="block text-sm font-bold mb-2">From Name:</label>
+          <input type="text" id="from-name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+          <label for="to-email" class="block text-sm font-bold mb-2">To Email (comma-separated):</label>
+          <textarea id="to-email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="3"></textarea>
+        </div>
+        <div class="mb-4">
+          <label for="subject" class="block text-sm font-bold mb-2">Subject:</label>
+          <input type="text" id="subject" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+          <label for="body" class="block text-sm font-bold mb-2">Body (HTML):</label>
+          <textarea id="body" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="5"></textarea>
+        </div>
+        <button id="send-email" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          Send Email
+        </button>
+
+        <div class="mt-6">
+          <h2 class="text-xl font-bold mb-2">Email Logs:</h2>
+          <div id="email-logs" class="bg-gray-800 p-4 rounded">
+            <!-- Email logs will be displayed here -->
+          </div>
+        </div>
+      </div>
+      <div class="w-1/3 pl-4">
+        <div class="mb-4">
+          <label for="imap-host" class="block text-sm font-bold mb-2">IMAP Host:</label>
+          <input type="text" id="imap-host" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+          <label for="imap-port" class="block text-sm font-bold mb-2">IMAP Port:</label>
+          <input type="text" id="imap-port" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+          <label for="imap-user" class="block text-sm font-bold mb-2">IMAP User:</label>
+          <input type="text" id="imap-user" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <div class="mb-4">
+          <label for="imap-pass" class="block text-sm font-bold mb-2">IMAP Password:</label>
+          <input type="password" id="imap-pass" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+        <button id="get-latest" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          Get Latest Emails
+        </button>
+
+        <div class="mt-6">
+          <h2 class="text-xl font-bold mb-2">Incoming Emails:</h2>
+          <ul id="incoming-emails" class="bg-gray-800 p-4 rounded">
+            <!-- Incoming emails will be displayed here -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sendEmailButton = document.getElementById('send-email');
+    const emailLogs = document.getElementById('email-logs');
+    const getLatestButton = document.getElementById('get-latest');
+    const incomingEmails = document.getElementById('incoming-emails');
+
+    sendEmailButton.addEventListener('click', async () => {
+      const smtpHost = document.getElementById('smtp-host').value;
+      const smtpPort = document.getElementById('smtp-port').value;
+      const smtpSecure = document.getElementById('smtp-secure').checked;
+      const smtpUser = document.getElementById('smtp-user').value;
+      const smtpPass = document.getElementById('smtp-pass').value;
+      const fromEmail = document.getElementById('from-email').value;
+      const fromName = document.getElementById('from-name').value;
+      const toEmail = document.getElementById('to-email').value.split(',');
+      const subject = document.getElementById('subject').value;
+      const body = document.getElementById('body').value;
+
+      for (const email of toEmail) {
+        try {
+          const response = await fetch('/send-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              host: smtpHost,
+              port: smtpPort,
+              secure: smtpSecure,
+              user: smtpUser,
+              pass: smtpPass,
+              fromEmail: fromEmail,
+              fromName: fromName,
+              toEmail: email.trim(),
+              subject: subject,
+              body: body,
+            }),
+          });
+          const data = await response.text();
+          emailLogs.innerHTML += `<p>${data}</p>`;
+        } catch (error) {
+          console.error('Error sending email:', error);
+          emailLogs.innerHTML += `<p><span style="color:red">Failed to send email to ${email.trim()}</span></p>`;
+        }
+      }
+    });
+
+    getLatestButton.addEventListener('click', async () => {
+      const imapHost = document.getElementById('imap-host').value;
+      const imapPort = document.getElementById('imap-port').value;
+      const imapUser = document.getElementById('imap-user').value;
+      const imapPass = document.getElementById('imap-pass').value;
+
+      try {
+        const response = await fetch('/get-latest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            host: imapHost,
+            port: imapPort,
+            user: imapUser,
+            pass: imapPass,
+          }),
+        });
+        const data = await response.json();
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+          <button class="text-left w-full" onclick="toggleEmailContent(this)">
+            ${data.title}
+          </button>
+          <div class="hidden">
+            ${data.content}
+          </div>
+        `;
+        incomingEmails.appendChild(listItem);
+      } catch (error) {
+        console.error('Error getting latest emails:', error);
+      }
+    });
+
+    function toggleEmailContent(button) {
+      const contentDiv = button.nextElementSibling;
+      contentDiv.classList.toggle('hidden');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "email-app",
+  "version": "1.0.0",
+  "description": "A simple Node.js app for sending and receiving emails",
+  "main": "smtp.js",
+  "scripts": {
+    "start": "node smtp.js"
+  },
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "imap": "^0.8.19",
+    "nodemailer": "^6.9.14"
+  }
+}
