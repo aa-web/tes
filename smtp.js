@@ -60,6 +60,8 @@ app.post('/get-latest', (req, res) => {
         res.status(500).send({ error: 'Failed to search for emails' });
       } else {
         const latestEmail = results[0];
+	console.log("results:");
+	      console.log(typeof latestEmails)
         imapClient.fetch(latestEmail, { bodies: '' }, (err, messages) => {
           if (err) {
             res.status(500).send({ error: 'Failed to fetch email' });
