@@ -64,12 +64,17 @@ app.post('/get-latest', (req, res) => {
           if (err) {
             res.status(500).send({ error: 'Failed to fetch email' });
           } else {
+	    try{
             const email = messages[0];
             const title = email.attributes[0].value;
             console.log(title)
             const content = email.parts[0].body;
             console.log(content)
             res.send(JSON.decycle({ title, content }, true));
+	    }catch(error){
+	     res.status(500).send(error);
+	     console.log(error);
+	    }
           }
         });
       }
